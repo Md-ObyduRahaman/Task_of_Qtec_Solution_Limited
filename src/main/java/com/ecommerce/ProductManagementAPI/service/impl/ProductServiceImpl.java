@@ -9,7 +9,6 @@ import com.ecommerce.ProductManagementAPI.mapper.ProductMapper;
 import com.ecommerce.ProductManagementAPI.policy.ProductPolicy;
 import com.ecommerce.ProductManagementAPI.repository.ProductRepository;
 import com.ecommerce.ProductManagementAPI.service.IProductService;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +24,6 @@ public class ProductServiceImpl implements IProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
-
     private final ProductPolicy productPolicy;
 
 
@@ -40,12 +38,10 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public ProductDTO createProduct(ProductDTO productDTO) {
         productPolicy.validateProduct(productDTO);
-        // Check if product with the same name already exists
         if (!isProductNameUnique(productDTO.getName())) {
             throw new ProductAlreadyExistsException("Product with name '" + productDTO.getName() + "' already exists.");
         }
 
-        // Convert DTO to entity
         Product product = productMapper.toEntity(productDTO);
         product.setCreatedAt(LocalDateTime.now());
         product.setCreatedBy("CreatedByAdmin");
@@ -76,7 +72,6 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public boolean updateProduct(Long id, ProductDTO productDTO) {
         productPolicy.validateProduct(productDTO);
-        // Fetch the existing product
         boolean isUpdated=false;
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with the given input data", "id", id.toString()));
@@ -92,15 +87,14 @@ public class ProductServiceImpl implements IProductService {
         product.setProductId(id);
         product.setUpdatedAt(LocalDateTime.now());
         product.setUpdatedBy("ShopKeeper");
-        product.getInventory().setCreatedBy("ShopKeeper");
-        product.getInventory().setCreatedAt(LocalDateTime.now());
+        product.getInventory().setStockQuantity(productDTO.getInventory().getStockQuantity());
+        product.getInventory().setUpdatedBy("ShopKeeper");
+        product.getInventory().setUpdatedAt(LocalDateTime.now());
 
-        // Save the updated product
-        product = productRepository.save(product);
+       productRepository.save(product);
 
         isUpdated=true;
 
-        // Return the updated product DTO
         return isUpdated;
     }
 
@@ -118,8 +112,8 @@ public class ProductServiceImpl implements IProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found", "id", id.toString()));
         product.getInventory().setStockQuantity(stockQuantity);
-        product.getInventory().setCreatedBy("ShopKeeper");
-        product.getInventory().setCreatedAt(LocalDateTime.now());
+        product.getInventory().setUpdatedBy("ShopKeeper");
+        product.getInventory().setUpdatedAt(LocalDateTime.now());
         productRepository.save(product);
         return Optional.of(ProductMapper.toDTO(product));
     }

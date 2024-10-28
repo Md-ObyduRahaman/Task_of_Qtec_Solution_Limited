@@ -14,13 +14,13 @@ public class Inventory extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long inventoryId;
 
     @Column(nullable = false)
     private Integer stockQuantity;
 
-    // One-to-One relationship back to Product
-    @OneToOne  // Ensures that Inventory is required/ Defines foreign key
+    @OneToOne
     @JoinColumn(name = "product_id", nullable = false)
     @JsonBackReference
     private Product product;

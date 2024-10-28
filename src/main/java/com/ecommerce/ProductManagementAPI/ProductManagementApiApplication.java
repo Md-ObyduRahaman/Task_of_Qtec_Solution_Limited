@@ -10,7 +10,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
-//@EnableJpaAuditing(auditorAwareRef = "auditAwareImpl")
 @OpenAPIDefinition(
 		info = @Info(
 				title = "Product Management REST API Documentation",
@@ -19,10 +18,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 				contact = @Contact(
 						name = "Md Obydur Rahaman Sojib",
 						email = "sojib19991018@gmail.com",
-						url = "https://www.ecommerce.com"
-				),
-				license = @License(
-						name = "Apache 2.0",
 						url = "https://www.ecommerce.com"
 				)
 		),

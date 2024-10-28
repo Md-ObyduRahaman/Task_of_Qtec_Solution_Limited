@@ -36,13 +36,6 @@ public class ProductDTO {
 
     public ProductDTO() {}
 
-    public ProductDTO(String name, String description, BigDecimal price,  String category,Inventory inventory) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.category = category;
-        this.inventory=inventory;
-    }
 
 
 }
