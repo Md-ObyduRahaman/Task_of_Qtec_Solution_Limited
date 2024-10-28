@@ -4,6 +4,7 @@ import com.ecommerce.ProductManagementAPI.dto.ProductDTO;
 import com.ecommerce.ProductManagementAPI.entity.Product;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IProductService {
     ProductDTO createProduct(ProductDTO productDTO);
@@ -12,11 +13,11 @@ public interface IProductService {
 
     List<ProductDTO> getAllProducts(int page, int size, String sortBy, String sortDirection);
 
-    ProductDTO updateProduct(Long id, ProductDTO productDTO);
+    boolean updateProduct(Long id, ProductDTO productDTO);
 
-    void deleteProduct(Long id);
+    boolean deleteProduct(Long id);
 
-    ProductDTO updateStockQuantity(Long id, Integer stockQuantity);
+    Optional<ProductDTO> updateStockQuantity(Long id, Integer stockQuantity);
 
     boolean isProductNameUnique(String name);
 }

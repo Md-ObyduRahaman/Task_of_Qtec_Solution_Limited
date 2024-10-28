@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements IProductService {
@@ -62,10 +63,11 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
+    public boolean updateProduct(Long id, ProductDTO productDTO) {
         // Fetch the existing product
+        boolean isUpdated=false;
          Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id.toString()));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found", "id", id.toString()));
 
         // Check if another product with the same name already exists
         if (!isProductNameUnique(productDTO.getName()) && !product.getName().equals(productDTO.getName())) {
@@ -83,25 +85,28 @@ public class ProductServiceImpl implements IProductService {
         // Save the updated product
         product = productRepository.save(product);
 
+        isUpdated=true;
+
         // Return the updated product DTO
-        return productMapper.toDTO(product);
+        return isUpdated;
     }
 
 
     @Override
-    public void deleteProduct(Long id) {
+    public boolean deleteProduct(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id.toString()));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found", "id", id.toString()));
         productRepository.delete(product);
+        return true;
     }
 
     @Override
-    public ProductDTO updateStockQuantity(Long id, Integer stockQuantity) {
+    public Optional<ProductDTO> updateStockQuantity(Long id, Integer stockQuantity) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id.toString()));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found", "id", id.toString()));
         product.setStockQuantity(stockQuantity);
          productRepository.save(product);
-        return productMapper.toDTO(product);
+        return Optional.of(ProductMapper.toDTO(product));
     }
 
     @Override

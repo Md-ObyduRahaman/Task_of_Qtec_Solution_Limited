@@ -24,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Tag(
         name = "Product Management APIs",
@@ -66,7 +67,7 @@ public class ProductsController {
         productService.createProduct(productDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ResponseDto("201", "Product created successfully"));
+                .body(new ResponseDto(ProductsConstants.STATUS_201, ProductsConstants.MESSAGE_201));
     }
 
     @Operation(
@@ -163,8 +164,15 @@ public class ProductsController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<ResponseDto> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDTO productDto) {
-        productService.updateProduct(id, productDto);
-        return ResponseEntity.ok(new ResponseDto("200", "Product updated successfully"));
+        if (productService.updateProduct(id, productDto)){
+            return ResponseEntity.ok(new ResponseDto("200", "Product updated successfully"));
+
+        }
+        else {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDto(ProductsConstants.STATUS_417, ProductsConstants.MESSAGE_417_UPDATE));
+        }
     }
 
     @Operation(
@@ -192,11 +200,16 @@ public class ProductsController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ResponseDto> deleteProduct(@PathVariable Long id) {
+        if (productService.deleteProduct(id)){
+            return ResponseEntity.ok(new ResponseDto(ProductsConstants.STATUS_202, ProductsConstants.MESSAGE_202));
+        }
+        else {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDto(ProductsConstants.STATUS_417, ProductsConstants.MESSAGE_417_DELETE));
+        }
     }
-
     @Operation(
             summary = "Update Product Stock REST API",
             description = "REST API to update the stock quantity of a product by its ID"
@@ -229,8 +242,15 @@ public class ProductsController {
             )
     })
     @PatchMapping("/{id}/update-stock")
-    public ResponseEntity<ResponseDto> updateProductStock(@PathVariable Long id, @RequestParam @Positive Integer quantity) {
-        productService.updateStockQuantity(id, quantity);
-        return ResponseEntity.ok(new ResponseDto("200", "Product stock updated successfully"));
+    public ResponseEntity<Object> updateProductStock(@PathVariable Long id, @RequestParam @Positive Integer quantity) {
+        Optional<ProductDTO> productDTO= productService.updateStockQuantity(id, quantity);
+        if (productDTO.isPresent()){
+            return ResponseEntity.status(HttpStatus.OK).body(productDTO);
+        }
+        else {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDto(ProductsConstants.STATUS_418, ProductsConstants.MESSAGE_418_STOCK_UPDATE));
+        }
     }
 }
