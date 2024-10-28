@@ -40,9 +40,6 @@ public class ProductsController {
     private final IProductService productService;
 
 
-
-
-
     @Operation(
             summary = "Create Product REST API",
             description = "REST API to create a new product"
@@ -68,7 +65,7 @@ public class ProductsController {
             )
     })
     @PostMapping
-    public ResponseEntity<ResponseDto> createProduct(@Valid @RequestBody ProductDTO productDto) {
+    public ResponseEntity<ResponseDto> createProduct(/*@Valid*/ @RequestBody ProductDTO productDto) {
         productService.createProduct(productDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -168,7 +165,7 @@ public class ProductsController {
             )
     })
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseDto> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDTO productDto) {
+    public ResponseEntity<ResponseDto> updateProduct(@PathVariable Long id, /*@Valid*/ @RequestBody ProductDTO productDto) {
         if (productService.updateProduct(id, productDto)){
             return ResponseEntity.ok(new ResponseDto("200", "Product updated successfully"));
 
@@ -247,7 +244,7 @@ public class ProductsController {
             )
     })
     @PatchMapping("/{id}/update-stock")
-    public ResponseEntity<Object> updateProductStock(@PathVariable Long id, @RequestParam @Positive Integer quantity) {
+    public ResponseEntity<Object> updateProductStock(@PathVariable Long id, @RequestParam /*@Positive*/ Integer quantity) {
         Optional<ProductDTO> productDTO= productService.updateStockQuantity(id, quantity);
         if (productDTO.isPresent()){
             return ResponseEntity.status(HttpStatus.OK).body(productDTO);
