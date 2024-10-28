@@ -19,5 +19,6 @@ public interface IProductService {
 
     Optional<ProductDTO> updateStockQuantity(Long id, Integer stockQuantity);
 
+
     boolean isProductNameUnique(String name);
 }

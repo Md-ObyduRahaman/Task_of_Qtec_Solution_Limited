@@ -6,6 +6,7 @@ import com.ecommerce.ProductManagementAPI.entity.Product;
 import com.ecommerce.ProductManagementAPI.exception.ProductAlreadyExistsException;
 import com.ecommerce.ProductManagementAPI.exception.ResourceNotFoundException;
 import com.ecommerce.ProductManagementAPI.mapper.ProductMapper;
+import com.ecommerce.ProductManagementAPI.policy.ProductPolicy;
 import com.ecommerce.ProductManagementAPI.repository.ProductRepository;
 import com.ecommerce.ProductManagementAPI.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +25,19 @@ public class ProductServiceImpl implements IProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
+    private final ProductPolicy productPolicy;
+
+
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper) {
+    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper,ProductPolicy productPolicy) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
+        this.productPolicy = productPolicy;
     }
 
     @Override
     public ProductDTO createProduct(ProductDTO productDTO) {
+        productPolicy.validateProduct(productDTO);
         // Check if product with the same name already exists
         if (!isProductNameUnique(productDTO.getName())) {
             throw new ProductAlreadyExistsException("Product with name '" + productDTO.getName() + "' already exists.");
@@ -64,6 +70,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public boolean updateProduct(Long id, ProductDTO productDTO) {
+        productPolicy.validateProduct(productDTO);
         // Fetch the existing product
         boolean isUpdated=false;
          Product product = productRepository.findById(id)
