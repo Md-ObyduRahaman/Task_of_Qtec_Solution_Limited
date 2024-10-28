@@ -1,6 +1,7 @@
 package com.ecommerce.ProductManagementAPI.dto;
 
 
+import com.ecommerce.ProductManagementAPI.entity.Inventory;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,24 +25,25 @@ public class ProductDTO {
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be a positive value.")
     private BigDecimal price;
 
-    @NotNull(message = "Stock quantity is required.")
-    @PositiveOrZero(message = "Stock quantity must be a non-negative value.")
-    private Integer stockQuantity;
 
     @NotBlank(message = "Category is required.")
     @Size(max = 100, message = "Category must be less than 100 characters.")
     private String category;
 
+
+    @NotNull(message = "Inventory is required.")
+    private Inventory inventory;
+
     // Default constructor
     public ProductDTO() {}
 
     // Parameterized constructor
-    public ProductDTO(String name, String description, BigDecimal price, Integer stockQuantity, String category) {
+    public ProductDTO(String name, String description, BigDecimal price,  String category,Inventory inventory) {
         this.name = name;
         this.description = description;
         this.price = price;
-        this.stockQuantity = stockQuantity;
         this.category = category;
+        this.inventory=inventory;
     }
 
 

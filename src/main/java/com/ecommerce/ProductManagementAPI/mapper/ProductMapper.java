@@ -1,6 +1,7 @@
 package com.ecommerce.ProductManagementAPI.mapper;
 
 import com.ecommerce.ProductManagementAPI.dto.ProductDTO;
+import com.ecommerce.ProductManagementAPI.entity.Inventory;
 import com.ecommerce.ProductManagementAPI.entity.Product;
 import org.springframework.stereotype.Component;
 
@@ -10,11 +11,13 @@ public class ProductMapper {
     // Convert ProductDTO to Product entity
     public static Product toEntity(ProductDTO productDTO) {
         Product product = new Product();
+        Inventory productInventory = productDTO.getInventory();
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
         product.setPrice(productDTO.getPrice());
-        product.setStockQuantity(productDTO.getStockQuantity());
         product.setCategory(productDTO.getCategory());
+        product.setInventory(productDTO.getInventory());
+        productInventory.setProduct(product);
         return product;
     }
 
@@ -24,8 +27,8 @@ public class ProductMapper {
         productDTO.setName(product.getName());
         productDTO.setDescription(product.getDescription());
         productDTO.setPrice(product.getPrice());
-        productDTO.setStockQuantity(product.getStockQuantity());
         productDTO.setCategory(product.getCategory());
+        productDTO.setInventory(product.getInventory());
         return productDTO;
     }
 }

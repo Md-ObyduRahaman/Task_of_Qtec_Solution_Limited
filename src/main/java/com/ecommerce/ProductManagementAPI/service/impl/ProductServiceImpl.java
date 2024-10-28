@@ -9,6 +9,7 @@ import com.ecommerce.ProductManagementAPI.mapper.ProductMapper;
 import com.ecommerce.ProductManagementAPI.policy.ProductPolicy;
 import com.ecommerce.ProductManagementAPI.repository.ProductRepository;
 import com.ecommerce.ProductManagementAPI.service.IProductService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,7 @@ public class ProductServiceImpl implements IProductService {
         this.productPolicy = productPolicy;
     }
 
+
     @Override
     public ProductDTO createProduct(ProductDTO productDTO) {
         productPolicy.validateProduct(productDTO);
@@ -47,8 +49,11 @@ public class ProductServiceImpl implements IProductService {
         Product product = productMapper.toEntity(productDTO);
         product.setCreatedAt(LocalDateTime.now());
         product.setCreatedBy("CreatedByAdmin");
+        product.getInventory().setCreatedBy("CreatedByAdmin");
+        product.getInventory().setCreatedAt(LocalDateTime.now());
 
         product= productRepository.save(product);
+
         return productMapper.toDTO(product);
     }
 
@@ -73,21 +78,22 @@ public class ProductServiceImpl implements IProductService {
         productPolicy.validateProduct(productDTO);
         // Fetch the existing product
         boolean isUpdated=false;
-         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found", "id", id.toString()));
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with the given input data", "id", id.toString()));
 
         // Check if another product with the same name already exists
         if (!isProductNameUnique(productDTO.getName()) && !product.getName().equals(productDTO.getName())) {
             throw new ProductAlreadyExistsException("Product with name '" + productDTO.getName() + "' already exists.");
         }
-
-
-        product= ProductMapper.toEntity(productDTO);
-
-        // Set updated fields
-        product.setId(id);
+        product.setName(productDTO.getName());
+        product.setDescription(productDTO.getDescription());
+        product.setPrice(productDTO.getPrice());
+        product.setCategory(productDTO.getCategory());
+        product.setProductId(id);
         product.setUpdatedAt(LocalDateTime.now());
         product.setUpdatedBy("ShopKeeper");
+        product.getInventory().setCreatedBy("ShopKeeper");
+        product.getInventory().setCreatedAt(LocalDateTime.now());
 
         // Save the updated product
         product = productRepository.save(product);
@@ -111,8 +117,10 @@ public class ProductServiceImpl implements IProductService {
     public Optional<ProductDTO> updateStockQuantity(Long id, Integer stockQuantity) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found", "id", id.toString()));
-        product.setStockQuantity(stockQuantity);
-         productRepository.save(product);
+        product.getInventory().setStockQuantity(stockQuantity);
+        product.getInventory().setCreatedBy("ShopKeeper");
+        product.getInventory().setCreatedAt(LocalDateTime.now());
+        productRepository.save(product);
         return Optional.of(ProductMapper.toDTO(product));
     }
 
