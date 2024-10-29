@@ -3,6 +3,7 @@ package com.ecommerce.ProductManagementAPI.service.impl;
 
 import com.ecommerce.ProductManagementAPI.dto.ProductDTO;
 import com.ecommerce.ProductManagementAPI.entity.Product;
+import com.ecommerce.ProductManagementAPI.entity.ProductDiscount;
 import com.ecommerce.ProductManagementAPI.exception.ProductAlreadyExistsException;
 import com.ecommerce.ProductManagementAPI.exception.ResourceNotFoundException;
 import com.ecommerce.ProductManagementAPI.mapper.ProductMapper;
@@ -42,7 +43,13 @@ public class ProductServiceImpl implements IProductService {
             throw new ProductAlreadyExistsException("Product with name '" + productDTO.getName() + "' already exists.");
         }
 
+
         Product product = productMapper.toEntity(productDTO);
+
+
+
+
+
         product.setCreatedAt(LocalDateTime.now());
         product.setCreatedBy("CreatedByAdmin");
         product.getInventory().setCreatedBy("CreatedByAdmin");

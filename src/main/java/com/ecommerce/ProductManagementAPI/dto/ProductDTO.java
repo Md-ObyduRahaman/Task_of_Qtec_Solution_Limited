@@ -2,16 +2,20 @@ package com.ecommerce.ProductManagementAPI.dto;
 
 
 import com.ecommerce.ProductManagementAPI.entity.Inventory;
+import com.ecommerce.ProductManagementAPI.entity.ProductDiscount;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class ProductDTO {
 
     @NotBlank(message = "Product name is required.")
@@ -33,6 +37,9 @@ public class ProductDTO {
 
     @NotNull(message = "Inventory is required.")
     private Inventory inventory;
+
+    @NotNull(message = "productDiscounts is required.")
+    private List<ProductDiscount> productDiscounts;
 
     public ProductDTO() {}
 

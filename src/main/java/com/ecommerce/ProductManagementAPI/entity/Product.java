@@ -1,9 +1,12 @@
 package com.ecommerce.ProductManagementAPI.entity;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -30,6 +33,11 @@ public class Product extends BaseEntity {
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "product")
     private Inventory inventory;
+
+    // List to store multiple productDiscount
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<ProductDiscount> productDiscounts = new ArrayList<>();
 
 }
 
