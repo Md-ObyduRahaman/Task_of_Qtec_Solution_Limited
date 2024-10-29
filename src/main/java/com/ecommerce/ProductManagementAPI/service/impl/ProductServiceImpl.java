@@ -44,7 +44,8 @@ public class ProductServiceImpl implements IProductService {
         }
 
 
-        Product product = productMapper.toEntity(productDTO);
+        Product product = new Product();
+                productMapper.toEntity(productDTO,product);
 
 
 
@@ -57,14 +58,14 @@ public class ProductServiceImpl implements IProductService {
 
         product= productRepository.save(product);
 
-        return productMapper.toDTO(product);
+        return productMapper.toDTO(product,new ProductDTO());
     }
 
     @Override
     public ProductDTO getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with the given input data", "id", id.toString()));
-        ProductDTO productDTO = productMapper.toDTO(product);
+        ProductDTO productDTO = productMapper.toDTO(product,new ProductDTO());
         return productDTO;
 
     }
@@ -73,7 +74,12 @@ public class ProductServiceImpl implements IProductService {
     public List<ProductDTO> getAllProducts(int page, int size, String sortBy, String sortDirection) {
         Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        return productRepository.findAll(pageable).getContent().stream().map(ProductMapper::toDTO).toList();
+        return productRepository.findAll(pageable)
+                .getContent()
+                .stream()
+                .map(product -> ProductMapper.toDTO(product, new ProductDTO()))
+                .toList();
+
     }
 
     @Override
@@ -87,14 +93,9 @@ public class ProductServiceImpl implements IProductService {
         if (!isProductNameUnique(productDTO.getName()) && !product.getName().equals(productDTO.getName())) {
             throw new ProductAlreadyExistsException("Product with name '" + productDTO.getName() + "' already exists.");
         }
-        product.setName(productDTO.getName());
-        product.setDescription(productDTO.getDescription());
-        product.setPrice(productDTO.getPrice());
-        product.setCategory(productDTO.getCategory());
-        product.setProductId(id);
+        product =ProductMapper.toEntity(productDTO,product);
         product.setUpdatedAt(LocalDateTime.now());
         product.setUpdatedBy("ShopKeeper");
-        product.getInventory().setStockQuantity(productDTO.getInventory().getStockQuantity());
         product.getInventory().setUpdatedBy("ShopKeeper");
         product.getInventory().setUpdatedAt(LocalDateTime.now());
 
@@ -122,7 +123,7 @@ public class ProductServiceImpl implements IProductService {
         product.getInventory().setUpdatedBy("ShopKeeper");
         product.getInventory().setUpdatedAt(LocalDateTime.now());
         productRepository.save(product);
-        return Optional.of(ProductMapper.toDTO(product));
+        return Optional.of(ProductMapper.toDTO(product,new ProductDTO()));
     }
 
     @Override

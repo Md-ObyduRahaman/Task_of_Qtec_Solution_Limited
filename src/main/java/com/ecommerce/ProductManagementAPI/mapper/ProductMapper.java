@@ -13,31 +13,30 @@ import java.util.List;
 public class ProductMapper {
 
     // Convert ProductDTO to Product entity
-    public static Product toEntity(ProductDTO productDTO) {
-        Product product = new Product();
-        Inventory productInventory = productDTO.getInventory();
-        List<ProductDiscount> list= productDTO.getProductDiscounts();
-        List<ProductDiscount> list2 = new ArrayList<>();
+    public static Product toEntity(ProductDTO productDTO, Product product) {
 
-        product.setName(productDTO.getName());
-        product.setDescription(productDTO.getDescription());
-        product.setPrice(productDTO.getPrice());
-        product.setCategory(productDTO.getCategory());
-        product.setInventory(productDTO.getInventory());
-        productInventory.setProduct(product);
-
-        for (ProductDiscount productDiscount : list)
+        if(isEmpty(product))
         {
-            productDiscount.setProduct(product);
-            list2.add(productDiscount);
+            product.setName(productDTO.getName());
+            product.setDescription(productDTO.getDescription());
+            product.setPrice(productDTO.getPrice());
+            product.setCategory(productDTO.getCategory());
+            product.setInventory(productDTO.getInventory());
+            product.setProductDiscounts(productDTO.getProductDiscounts());
         }
-        product.setProductDiscounts(list2);
+        else {
+            product.setName(product.getName());
+            product.setDescription(product.getDescription());
+            product.setPrice(product.getPrice());
+            product.setCategory(product.getCategory());
+            product.setInventory(product.getInventory());
+            product.setProductDiscounts(product.getProductDiscounts());
+        }
         return product;
     }
 
     // Convert Product entity to ProductDTO
-    public static ProductDTO toDTO(Product product) {
-        ProductDTO productDTO = new ProductDTO();
+    public static ProductDTO toDTO(Product product, ProductDTO productDTO) {
         productDTO.setName(product.getName());
         productDTO.setDescription(product.getDescription());
         productDTO.setPrice(product.getPrice());
@@ -46,4 +45,14 @@ public class ProductMapper {
         productDTO.setProductDiscounts(product.getProductDiscounts());
         return productDTO;
     }
+
+    public static boolean isEmpty(Product product) {
+        return (product.getName() == null || product.getName().isEmpty()) &&
+                (product.getDescription() == null || product.getDescription().isEmpty()) &&
+                product.getPrice() == null &&
+                (product.getCategory() == null || product.getCategory().isEmpty()) &&
+                product.getInventory() == null &&
+                (product.getProductDiscounts() == null || product.getProductDiscounts().isEmpty());
+    }
+
 }
