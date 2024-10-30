@@ -39,27 +39,34 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public ProductDTO createProduct(ProductDTO productDTO) {
         productPolicy.validateProduct(productDTO);
+
         if (!isProductNameUnique(productDTO.getName())) {
             throw new ProductAlreadyExistsException("Product with name '" + productDTO.getName() + "' already exists.");
         }
 
-
-        Product product = new Product();
-                productMapper.toEntity(productDTO,product);
-
-
-
-
-
+        // Convert DTO to entity and initialize Inventory if needed
+        Product product = ProductMapper.toEntity(productDTO, new Product());
         product.setCreatedAt(LocalDateTime.now());
         product.setCreatedBy("CreatedByAdmin");
-        product.getInventory().setCreatedBy("CreatedByAdmin");
-        product.getInventory().setCreatedAt(LocalDateTime.now());
 
-        product= productRepository.save(product);
+        if (product.getInventory() != null) {
+            product.getInventory().setCreatedBy("CreatedByAdmin");
+            product.getInventory().setCreatedAt(LocalDateTime.now());
+            product.getInventory().setProduct(product);
+        }
 
-        return productMapper.toDTO(product,new ProductDTO());
+
+        if (!product.getProductDiscounts().isEmpty()) {
+            for (int i = 0; i < product.getProductDiscounts().size(); i++) {
+                product.getProductDiscounts().get(i).setProduct(product);
+            }
+        }
+        // Save product, which should cascade to Inventory and set product_id
+        product = productRepository.save(product);
+
+        return productMapper.toDTO(product, new ProductDTO());
     }
+
 
     @Override
     public ProductDTO getProductById(Long id) {

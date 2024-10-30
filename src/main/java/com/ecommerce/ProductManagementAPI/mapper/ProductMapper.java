@@ -24,6 +24,24 @@ public class ProductMapper {
             product.setInventory(productDTO.getInventory());
             product.setProductDiscounts(productDTO.getProductDiscounts());
         }
+        else if(!isEmpty(productDTO) && !isEmpty(product)) {
+            product.setName(productDTO.getName());
+            product.setDescription(productDTO.getDescription());
+            product.setPrice(productDTO.getPrice());
+            product.setCategory(product.getCategory());
+            product.getInventory().setStockQuantity(productDTO.getInventory().getStockQuantity());
+
+
+
+            product.setInventory(product.getInventory());
+            product.setProductDiscounts(product.getProductDiscounts());
+            if (!product.getProductDiscounts().isEmpty()) {
+                for (int i = 0; i < product.getProductDiscounts().size(); i++) {
+                    product.getProductDiscounts().get(i).setDiscountPercentage(productDTO.getProductDiscounts().get(i).getDiscountPercentage());
+                    product.getProductDiscounts().get(i).setProduct(product);
+                }
+            }
+        }
         else {
             product.setName(product.getName());
             product.setDescription(product.getDescription());
@@ -54,5 +72,15 @@ public class ProductMapper {
                 product.getInventory() == null &&
                 (product.getProductDiscounts() == null || product.getProductDiscounts().isEmpty());
     }
+
+    public static boolean isEmpty(ProductDTO productDTO) {
+        return (productDTO.getName() == null || productDTO.getName().isEmpty()) &&
+                (productDTO.getDescription() == null || productDTO.getDescription().isEmpty()) &&
+                productDTO.getPrice() == null &&
+                (productDTO.getCategory() == null || productDTO.getCategory().isEmpty()) &&
+                productDTO.getInventory() == null &&
+                (productDTO.getProductDiscounts() == null || productDTO.getProductDiscounts().isEmpty());
+    }
+
 
 }
